@@ -6,6 +6,8 @@ const { animals } = require('./data/animals');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+// link the public folder so the page can use the client-side HTML, CSS, and JavaScript
+app.use(express.static('public'));
 // parse incoming string or array data
 app.use(express.urlencoded({ extended: true }));
 // parse incoming JSON data
@@ -45,6 +47,7 @@ function findById(id, animalsArray) {
     return result;
 };
 
+// create a new animal
 function createNewAnimal(body, animalsArray) {
     const animal = body;
     animalsArray.push(animal);
@@ -56,6 +59,7 @@ function createNewAnimal(body, animalsArray) {
     return animal;
 };
 
+// validate new animal user input
 function validateAnimal(animal) {
     if (!animal.name || typeof animal.name !== 'string') {
       return false;
@@ -91,6 +95,7 @@ app.get('/api/animals/:id', (req, res) => {
     }
 });
 
+// post newly created and validated animal to the animals.json file
 app.post('/api/animals', (req, res) => {
     // set id based on what the next index of the array will be
     req.body.id = animals.length.toString();
@@ -102,6 +107,26 @@ app.post('/api/animals', (req, res) => {
       const animal = createNewAnimal(req.body, animals);
       res.json(animal);
     }
+});
+
+// display the index HTML page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+// display the animals HTML page
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+// display the zookeepers HTML page
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+// display if HTML page route is unavailable (in case of errors)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
 });
 
 // listening event at the port
